@@ -26,7 +26,7 @@ struct Node
 };
 
 //Main functions
-mat simulation(List tree_list, int size_simulation, mat support);
+mat simulation(List tree_list, int size_simulation, mat uniform_values, mat support);
 vec update_vec(Node* node, vec& x);
 List evaluate_log_density(List tree_list, mat eval_points, mat support);
 

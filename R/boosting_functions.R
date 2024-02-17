@@ -150,8 +150,8 @@ boosting = function(data, # data: d x n matrix
   return(out)
 }
 
-simulation_b = function(list_boosting, size){
-  return(simulation(list_boosting$tree_list, size, list_boosting$Omega))
+simulation_b = function(list_boosting, size, uniform_values){
+  return(simulation(list_boosting$tree_list, size, uniform_values, list_boosting$Omega))
 }
 
 eval_density_b = function(list_boosting, eval_points){

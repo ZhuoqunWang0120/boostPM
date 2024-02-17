@@ -38,15 +38,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // simulation
-arma::mat simulation(List tree_list, int size_simulation, arma::mat support);
-RcppExport SEXP _boostPM_simulation(SEXP tree_listSEXP, SEXP size_simulationSEXP, SEXP supportSEXP) {
+arma::mat simulation(List tree_list, int size_simulation, arma::mat uniform_values, arma::mat support);
+RcppExport SEXP _boostPM_simulation(SEXP tree_listSEXP, SEXP size_simulationSEXP, SEXP uniform_valuesSEXP, SEXP supportSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type tree_list(tree_listSEXP);
     Rcpp::traits::input_parameter< int >::type size_simulation(size_simulationSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type uniform_values(uniform_valuesSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type support(supportSEXP);
-    rcpp_result_gen = Rcpp::wrap(simulation(tree_list, size_simulation, support));
+    rcpp_result_gen = Rcpp::wrap(simulation(tree_list, size_simulation, uniform_values, support));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -66,7 +67,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_boostPM_do_boosting", (DL_FUNC) &_boostPM_do_boosting, 15},
-    {"_boostPM_simulation", (DL_FUNC) &_boostPM_simulation, 3},
+    {"_boostPM_simulation", (DL_FUNC) &_boostPM_simulation, 4},
     {"_boostPM_evaluate_log_density", (DL_FUNC) &_boostPM_evaluate_log_density, 3},
     {NULL, NULL, 0}
 };

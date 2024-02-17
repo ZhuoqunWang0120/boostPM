@@ -5,8 +5,8 @@ do_boosting <- function(X, precision, alpha, beta, gamma, max_resol, num_each_di
     .Call(`_boostPM_do_boosting`, X, precision, alpha, beta, gamma, max_resol, num_each_dim, num_second, learn_rate, min_obs, nbins, eta_subsample, thresh_stop, ntrees_wait, max_n_var)
 }
 
-simulation <- function(tree_list, size_simulation, support) {
-    .Call(`_boostPM_simulation`, tree_list, size_simulation, support)
+simulation <- function(tree_list, size_simulation, uniform_values, support) {
+    .Call(`_boostPM_simulation`, tree_list, size_simulation, uniform_values, support)
 }
 
 evaluate_log_density <- function(tree_list, eval_points, support) {

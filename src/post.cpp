@@ -15,7 +15,7 @@ int d_g;
 
 
 // [[Rcpp::export]]
-mat simulation(List tree_list, int size_simulation, mat support){
+mat simulation(List tree_list, int size_simulation, mat uniform_values, mat support){
   
   //initialization
   d_g = support.n_rows;

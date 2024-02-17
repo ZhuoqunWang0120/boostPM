@@ -66,9 +66,9 @@ print(ggplot() + geom_tile(data = densities.df, aes(x=x1, y=x2, fill=density)) +
         scale_fill_viridis(discrete=FALSE) + ggtitle("Estimated density"))
 
 #Simulate from the estimated distribution
-simulated.data = simulation_b(list_boosting = out, # simply use the output of the boosting function 
-                              size = 1000 # size of simulation
-)
+# simulated.data = simulation_b(list_boosting = out, # simply use the output of the boosting function 
+                              # size = 1000 # size of simulation
+# )
 
-plot(simulated.data[,1], simulated.data[,2], xlim = c(0,1), ylim = c(0,1),xlab="x1",ylab="x2", main="simulated data")
+# plot(simulated.data[,1], simulated.data[,2], xlim = c(0,1), ylim = c(0,1),xlab="x1",ylab="x2", main="simulated data")
 
