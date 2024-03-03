@@ -158,6 +158,76 @@ List evaluate_log_density(List tree_list, mat eval_points, mat support){
   return out;
 }
 
+// [[Rcpp::export]]
+List evaluate_log_density_with_jacobian(List tree_list, mat eval_points, mat support){
+  //initialization
+  d_g = support.n_rows;
+  
+  vec log_width_store = zeros(d_g);
+  // NumericVector log_diag_jacobian(d_g, 0.0);
+  
+  
+  for(int j=0; j<d_g; j++){
+    double m_resize = support(j,0);
+    double M_resize = support(j,1);
+    
+    eval_points.col(j) = (eval_points.col(j) - m_resize) / (M_resize - m_resize);
+    
+    log_width_store(j) = log(M_resize - m_resize);
+  }
+  
+  double sum_log_width = sum(log_width_store);
+  vec log_diag_jacobian = -log_width_store;
+  int n_eval = eval_points.n_rows;
+  mat residuals_eval_points = eval_points.t();
+  
+  vec log_densities_boosting = zeros(n_eval);
+  
+  int num_trees = tree_list.size();
+  
+  vec mean_log_dens_path = zeros(num_trees);
+  
+  for(int index_tree = 0; index_tree<num_trees; index_tree++){
+    //reconstruct a tree
+    Node* root = get_root_node();
+    construct_tree(root, tree_list[index_tree]);
+    
+    //evaluate densities
+    vec x_temp;
+    for(int i=0; i<n_eval; ++i){
+      x_temp = residuals_eval_points.col(i);
+      log_densities_boosting(i) = log_densities_boosting(i) + evaluate_density(root, x_temp);
+    }
+    
+    for(int i=0;i<n_eval;i++){
+      x_temp = residuals_eval_points.col(i);
+      // residuals_eval_points.col(i) = residualize(root, x_temp);
+      List resid_jacobian = residualize_with_diag_jacobian(root, x_temp);
+      // Rcout << "Type of residuals_eval_points.col(" << i << "): " << typeid(residuals_eval_points.col(i)).name() << std::endl;
+      // Rcout << "Type of resid_jacobian[\"resid_curr\"]: " << typeid(resid_jacobian["resid_curr"]).name() << std::endl;
+      arma::vec resid_curr_arma = as<arma::vec>(resid_jacobian["resid_curr"]);
+      residuals_eval_points.col(i) = resid_curr_arma;
+      arma::vec log_diag_jacobian_arma = as<arma::vec>(resid_jacobian["log_diag_jacobian"]);
+      log_diag_jacobian += log_diag_jacobian_arma;
+      // log_diag_jacobian += resid_jacobian["log_diag_jacobian"];
+      } 
+    
+    //record progress
+    mean_log_dens_path(index_tree) = mean(log_densities_boosting) - sum_log_width;
+    
+    //delete the current tree
+    clear_node(root);
+  }
+  
+  List out;
+  
+  out = Rcpp::List::create(Rcpp::Named("log_densities") = log_densities_boosting - sum_log_width,
+                                Rcpp::Named("mean_log_dens_path") = mean_log_dens_path,
+                                Rcpp::Named("log_diag_jacobian") = log_diag_jacobian);
+  
+  return out;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Tree functions
@@ -312,11 +382,56 @@ vec residualize( Node* root, vec& x){
     theta = parent->theta;
     
     resid_curr(dim_selected) = local_move(resid_curr(dim_selected), left_point, right_point, theta, parent->location, parent->left == curr);
-    
-    curr = parent;
-  }
   
   return resid_curr;
+}
+}
+
+List residualize_with_diag_jacobian( Node* root, vec& x){
+  
+  //finde a terminal node that x belongs to
+  Node* curr = find_terminal_node(root, x);
+  
+  //go up the tree one by one
+  Node* parent;
+  
+  int dim_selected;
+  
+  double left_point;
+  double right_point;
+  double theta;
+  // double derivative;
+  
+  vec resid_curr = x;
+  // NumericVector diag_jacobian(x.size(), 0.0);
+  vec log_diag_jacobian = zeros(x.size());
+
+  
+  while(curr->parent != nullptr){
+    
+    parent = curr->parent;
+    
+    dim_selected = parent->dim_selected;
+    
+    left_point = parent->left_points(dim_selected);
+    right_point = parent->right_points(dim_selected);
+    theta = parent->theta;
+    
+    resid_curr(dim_selected) = local_move(resid_curr(dim_selected), left_point, right_point, theta, parent->location, parent->left == curr);
+    if(parent->left == curr){ 
+      log_diag_jacobian(dim_selected) += log(theta) - log(parent->location);
+      }else{
+        log_diag_jacobian(dim_selected) += log(1-theta) - log(1-parent->location);
+      }
+    
+
+    curr = parent;
+  }
+  List out;
+  out = Rcpp::List::create(Rcpp::Named("resid_curr") = resid_curr,
+                                Rcpp::Named("log_diag_jacobian") = log_diag_jacobian);
+  
+  return out;
 }
 
 Node* find_terminal_node(Node* root, vec& x){

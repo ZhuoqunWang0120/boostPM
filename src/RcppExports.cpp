@@ -65,10 +65,25 @@ BEGIN_RCPP
 END_RCPP
 }
 
+// evaluate_log_density
+List evaluate_log_density_with_jacobian(List tree_list, arma::mat eval_points, arma::mat support);
+RcppExport SEXP _boostPM_evaluate_log_density_with_jacobian(SEXP tree_listSEXP, SEXP eval_pointsSEXP, SEXP supportSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type tree_list(tree_listSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type eval_points(eval_pointsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type support(supportSEXP);
+    rcpp_result_gen = Rcpp::wrap(evaluate_log_density_with_jacobian(tree_list, eval_points, support));
+    return rcpp_result_gen;
+END_RCPP
+}
+
 static const R_CallMethodDef CallEntries[] = {
     {"_boostPM_do_boosting", (DL_FUNC) &_boostPM_do_boosting, 15},
     {"_boostPM_simulation", (DL_FUNC) &_boostPM_simulation, 4},
     {"_boostPM_evaluate_log_density", (DL_FUNC) &_boostPM_evaluate_log_density, 3},
+    {"_boostPM_evaluate_log_density_with_jacobian", (DL_FUNC) &_boostPM_evaluate_log_density_with_jacobian, 3},
     {NULL, NULL, 0}
 };
 

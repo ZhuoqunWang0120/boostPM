@@ -29,6 +29,7 @@ struct Node
 mat simulation(List tree_list, int size_simulation, mat uniform_values, mat support);
 vec update_vec(Node* node, vec& x);
 List evaluate_log_density(List tree_list, mat eval_points, mat support);
+List evaluate_log_density_with_jacobian(List tree_list, mat eval_points, mat support);
 
 //Tree functions
 
@@ -39,6 +40,8 @@ void construct_tree(Node* node, List tree_current);
 
 double evaluate_density(Node* root, vec& x);
 vec residualize( Node* root, vec& x);
+List residualize_with_diag_jacobian( Node* root, vec& x);
+
 
 Node* find_terminal_node(Node* root, vec& x);
 

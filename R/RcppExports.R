@@ -13,3 +13,7 @@ evaluate_log_density <- function(tree_list, eval_points, support) {
     .Call(`_boostPM_evaluate_log_density`, tree_list, eval_points, support)
 }
 
+evaluate_log_density_with_jacobian <- function(tree_list, eval_points, support) {
+    .Call(`_boostPM_evaluate_log_density_with_jacobian`, tree_list, eval_points, support)
+}
+

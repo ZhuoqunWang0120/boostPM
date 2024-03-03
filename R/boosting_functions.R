@@ -160,3 +160,10 @@ eval_density_b = function(list_boosting, eval_points){
   names(out) = c("log_densities", "mean_log_dens_path")
   return(out)
 }
+
+eval_density_jacobian_b = function(list_boosting, eval_points){
+  out_dens = evaluate_log_density_with_jacobian(list_boosting$tree_list, eval_points, list_boosting$Omega)
+  out = list(out_dens$log_densities, out_dens$mean_log_dens_path, out_dens$log_diag_jacobian)
+  names(out) = c("log_densities", "mean_log_dens_path", "log_diag_jacobian")
+  return(out)
+}
