@@ -8,7 +8,7 @@ The package may be easily installed using `devtools` as follows:
 
 ```
 library(devtools)
-install_github("MaStatLab/boostPM")
+install_github("ZhuoqunWang0120/boostPM")
 ```
 
 You can see how to use the functions in the example.
