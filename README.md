@@ -1,6 +1,6 @@
 # boostPM
 
-This package implements the boosting algorithm of Awaya and Ma (2022).
+This package implements the boosting algorithm of Awaya and Ma (2022). It is modified from MaStatLab/boostPM. 
 
 ### Install
 
