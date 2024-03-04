@@ -15,41 +15,46 @@ int d_g;
 
 
 // [[Rcpp::export]]
-mat simulation(List tree_list, int size_simulation, mat uniform_values, mat support){
+mat simulation(List tree_list, int size_simulation, mat uniform_values, mat support) {
   
-  //initialization
+  // Initialization
+  //int d_g = support.n_rows;
   d_g = support.n_rows;
   mat current_mat = zeros(d_g, size_simulation);
   
-  for(int i=0; i<size_simulation; i++){
-    vec temp = Rcpp::runif(d_g, 0.0, 1.0);
-    current_mat.col(i) = temp;
-  }
+  // Use the provided uniform random variables
+  current_mat = uniform_values;
   
   int num_trees = tree_list.size();
+  
+  for (int index_tree = num_trees - 1; index_tree > -1; index_tree--) {
 
-  for(int index_tree = num_trees-1; index_tree>-1; index_tree--){
-    //reconstruct a tree
+    // Reconstruct a tree
     Node* root = get_root_node();
     construct_tree(root, tree_list[index_tree]);
     
-    //update the current values with the top-down algorithm
+    // Update the current values with the top-down algorithm
     vec x_temp;
-    for(int i=0; i<size_simulation; i++){
+    for (int i = 0; i < size_simulation; i++) {
+      //cout << "i: " << i << endl;
       x_temp = current_mat.col(i);
+      //cout << "after x_temp" << endl;
       current_mat.col(i) = update_vec(root, x_temp);
     }
-
-    //delete the current tree
+    
+    // Delete the current tree
     clear_node(root);
   }
   
-  for(int i=0; i<size_simulation; i++){
+  // Scale the values to the given support
+  for (int i = 0; i < size_simulation; i++) {
+    //cout << "i (scaling): "<<i << endl;
     vec temp = current_mat.col(i);
-    for(int j=0; j < d_g; j++){
-      temp(j) = support(j,0) + temp(j) * (support(j,1) - support(j,0));
+    for (int j = 0; j < d_g; j++) {
+      //cout << "j (scaling): " << j << endl;
+      temp(j) = support(j, 0) + temp(j) * (support(j, 1) - support(j, 0));
     }
-
+    
     current_mat.col(i) = temp;
   }
   
@@ -160,6 +165,7 @@ List evaluate_log_density(List tree_list, mat eval_points, mat support){
 
 // [[Rcpp::export]]
 List evaluate_log_density_with_jacobian(List tree_list, mat eval_points, mat support){
+  // eval_points needs to be 1*d_g matrix (only one sample)
   //initialization
   d_g = support.n_rows;
   
@@ -178,7 +184,8 @@ List evaluate_log_density_with_jacobian(List tree_list, mat eval_points, mat sup
   
   double sum_log_width = sum(log_width_store);
   vec log_diag_jacobian = -log_width_store;
-  int n_eval = eval_points.n_rows;
+  // int n_eval = eval_points.n_rows;
+  int n_eval = 1;
   mat residuals_eval_points = eval_points.t();
   
   vec log_densities_boosting = zeros(n_eval);
